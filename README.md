@@ -1,38 +1,50 @@
-DDR Controller (DFI Interface) — Project Overview
-This project implements a simplified behavioral DDR memory controller that communicates with a DFI-compliant PHY. It is designed for simulation and learning purposes, supporting both training sequences (e.g. write leveling and read eye detection) and real transaction sequences (e.g. activate → read/write → precharge).
+# DDRX Subsystem — Behavioral DDR Controller (DFI Interface)
 
-Key Features
-Supports both Training Mode (PHY calibration) and Mission Mode (host-driven memory transactions)
+This project implements a simplified behavioral DDR memory controller that communicates with a DFI-compliant PHY. It models both training sequences (used for PHY calibration) and mission-mode transactions (used during normal operation), following JEDEC timing and interface guidelines.
 
-Implements standard DDR timing constraints: tRCD, tRP, tWRTP, tRTP, etc.
+## Current Functionality
 
-Issues ACT, READ, WRITE, and PRECHARGE commands using JEDEC-style control logic
+- **DFI-Compliant Command/Address Interface**  
+  Drives signals such as `dfi_address`, `dfi_act_n`, `dfi_ras_n`, `dfi_cas_n`, and others to simulate real-world DDR control.
 
-Models DFI-level signals for command, address, write, and read channels
+- **Training Mode**  
+  Includes:
+  - `WRITE_LEVELING`: Pulses `dfi_wrdata_en` periodically for PHY DQS alignment
+  - `READ_LEVELING`: Sends periodic `dfi_rddata_en` and detects a mock "eye center"
 
-Parameterized to support different DRAM configurations (banks, bank groups, ranks, data width)
+- **Mission Mode**  
+  FSM-based sequence handling:
+  - ACTIVATE → READ/WRITE → PRECHARGE
+  - Handles command timing (`tRCD`, `tCL`, `tCWL`, `tRP`, etc.)
+  - Tracks read/write beats using `BURST_LENGTH` and `DFI_RATIO`
 
-Functional Summary
-In Training Mode (mode = 0):
-The controller sends periodic write strobes for write leveling, and read strobes to simulate read eye center detection using a mocked alignment point.
+- **Resettable Driver Tasks**  
+  Modular reset and command tasks for better testbench control and FSM clarity.
 
-In Mission Mode (mode = 1):
-The controller responds to external cmd_* inputs, sequencing ACTIVATE, READ, WRITE, and PRECHARGE with correct delays and beat tracking (DFI burst length = 8, DFI ratio = 4).
+## Parameters
 
-Internally, the design uses:
+| Parameter      | Description                             |
+|----------------|-----------------------------------------|
+| `ADDR_WIDTH`   | Combined row/column address width       |
+| `BANK_WIDTH`   | Bank selection bits                     |
+| `BG_WIDTH`     | Bank group bits (DDR4+)                 |
+| `RANK_WIDTH`   | Rank/chip select bits                   |
+| `DATA_WIDTH`   | DQ bus width (typically 64)             |
 
-Separate FSMs for training and mission modes
+## Future Updates
 
-Beat counters for read/write data
+- Add testbench to verify FSMs and DFI signal timing
+- Create waveform-based validation and logs
+- Abstract PHY behavior to model delay/strobe logic
+- Support AXI-to-DDR bridge (for SoC use)
+- Add Refresh (`tRFC`) and ZQ Calibration support
+- Support for ECC, multiple ranks, and bank interleaving
+- Integrate with open-source DRAM models (e.g., Micron)
 
-Cycle counters to track timing margins
+## File List
 
-Simple command decoding and signal driving logic
+- `ddr_controller.sv` – Main behavioral DDR controller module
+- `README.md` – Project overview and progress
 
-Future Updates
-- Add testbench to simulate host commands and validate controller response
-- Integrate wave-level verification with timing assertions
-- Abstract out PHY into a separate model (eventually replace with real DRAM behavioral models)
-- Add AXI-to-DDR bridge logic to support real SoC-style integration
-- Support refresh, ZQ calibration, and power-down/self-refresh modes
-- Expand rank support and add out-of-order scheduling
+---
+
