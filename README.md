@@ -1,4 +1,4 @@
-# DDRX Subsystem — Behavioral DDR Controller (DFI Interface)
+# DDRX Subsystem
 
 This project implements a simplified behavioral DDR memory controller that communicates with a DFI-compliant PHY. It models both training sequences (used for PHY calibration) and mission-mode transactions (used during normal operation), following JEDEC timing and interface guidelines.
 
