@@ -1,6 +1,6 @@
 # DDRX Subsystem
 
-This project implements a simplified behavioral DDR memory controller that communicates with a DFI-compliant PHY. It models both training sequences (used for PHY calibration) and mission-mode transactions (used during normal operation), following JEDEC timing and interface guidelines.
+This project implements a simplified behavioral DDR memory controller that communicates with a DFI-compliant PHY. It models both training sequences (used for PHY calibration) and mission-mode transactions (used during normal operation), following JEDEC timing and interface guidelines. The PHY will be abstracted entirely in digital logic wherever possible, modeling key behaviors like strobe alignment, delay chains, and phase control. If needed, limited analog-inspired behavior may be introduced later. The design will remain modular to support future upscaling into mixed-signal accuracy as my understanding deepens. A public DRAM model (e.g., from Micron) will be integrated to complete the simulation loop, allowing full validation of timing, burst transfers, and DFI signal handoff across controller, PHY, and memory.
 
 ## Current Functionality
 
